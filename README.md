@@ -8,6 +8,8 @@ Output:
 Pairs : ( 6, 10) ( 4, 12) have sum : 16
 Pairs : ( 10, 22) ( 21, 11) have sum : 32
 ...
+
+Output is sorted by sum in ascending order.
 ```
 
 ## Algorithm
@@ -41,7 +43,7 @@ make test
 ### Option B — Local Python
 
 ```bash
-pip install -r requirements-dev.txt
+pip install -r requirements.txt
 
 # Run with examples
 python equal_sum_pairs.py
@@ -53,7 +55,6 @@ python equal_sum_pairs.py 6 4 12 10 22 54 32 42 21 11
 python equal_sum_pairs.py 1 2 4 6 3 1          # space-separated
 python equal_sum_pairs.py 1,2,4,6,3,1           # comma-separated
 python equal_sum_pairs.py "1, 2, 4, 6, 3, 1"   # comma + spaces (quoted)
-python equal_sum_pairs.py 1, 2, 4, 6, 3, 1      # comma + spaces (unquoted)
 
 # JSON output
 python equal_sum_pairs.py 6 4 12 10 22 54 --json
@@ -89,7 +90,7 @@ print(output)
 ├── Dockerfile               # Multi-stage: base → test → runtime
 ├── docker-compose.yml       # app + test services
 ├── Makefile                 # build / run / test shortcuts
-├── requirements.txt         # Runtime deps (stdlib only)
+├── requirements.txt         # Python dependencies (pytest, coverage, etc.)
 ```
 
 ## Pylance / VS Code

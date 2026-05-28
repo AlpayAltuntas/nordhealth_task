@@ -148,19 +148,29 @@ def print_results(array: list[int]) -> None:
 
 def _parse_numbers(tokens: list[str]) -> list[int]:
     """
-    Convert CLI tokens to a list of ints, supporting two separator styles:
+    Convert CLI tokens to a list of ints.
 
-    - Comma-separated  →  ``1,2,3,4``  or  ``1, 2, 3, 4``  (commas present)
-    - Space-separated  →  ``1 2 3 4``                       (no commas)
+    Supports:
+    - Space-separated: 1 2 3
+    - Comma-separated: 1,2,3
+    - Mixed spacing:   1, 2, 3
 
-    When commas are present the joined token string is split on commas so that
-    both ``1,2,3`` (single token) and ``1, 2, 3`` (multiple tokens) work
-    identically.  Raises ``SystemExit`` with a clear message on bad input.
+    Raises SystemExit on invalid input.
     """
-    joined = " ".join(tokens)
+    joined = " ".join(tokens).strip()
+
+    if not joined:
+        sys.exit("Error: no numbers supplied.")
 
     if "," in joined:
-        parts = [p.strip() for p in joined.split(",") if p.strip()]
+        raw_parts = joined.split(",")
+
+        # Reject empty entries caused by:
+        # trailing commas, double commas, etc.
+        if any(not p.strip() for p in raw_parts):
+            sys.exit("Error: invalid comma-separated input.")
+
+        parts = [p.strip() for p in raw_parts]
     else:
         parts = joined.split()
 

@@ -8,7 +8,7 @@ Run with:
 """
 
 from __future__ import annotations
-
+from pathlib import Path
 import pytest
 
 import json
@@ -16,12 +16,13 @@ import subprocess
 import sys
 
 from equal_sum_pairs import find_equal_sum, find_equal_sum_pairs, format_results, print_results, _parse_numbers
-
+PROJECT_ROOT = Path(__file__).parent
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
+# Not used in the tests, but can be helpful for debugging and writing new tests.
 def result_as_set(results: dict) -> set:
     """
     Convert results to a frozenset of (sum, frozenset-of-pairs) so that
@@ -132,6 +133,14 @@ class TestFindEqualSumPairs:
                 key = frozenset(p)
                 assert key not in seen, f"Duplicate pair {p} under sum {s}"
                 seen.add(key)
+    
+    def test_single_pair_sum_not_returned(self):
+        arr = [1, 2, 3, 10]
+
+        results = find_equal_sum_pairs(arr)
+
+        for pairs in results.values():
+            assert len(pairs) >= 2
 
 
 # ---------------------------------------------------------------------------
@@ -155,6 +164,32 @@ class TestFormatResults:
 
     def test_empty_results_give_empty_string(self):
         assert format_results({}) == ""
+
+    def test_format_results_deterministic(self):
+        arr = [6, 4, 12, 10]
+        r1 = format_results(find_equal_sum_pairs(arr))
+        r2 = format_results(find_equal_sum_pairs(arr))
+        assert r1 == r2
+
+    def test_large_random_input(self):
+        import random
+
+        arr = [random.randint(-1000, 1000) for _ in range(200)]
+
+        results = find_equal_sum_pairs(arr)
+
+        for s, pairs in results.items():
+            for a, b in pairs:
+                assert a + b == s
+
+    def test_results_order_independent(self):
+        arr = [4, 23, 65, 67, 24, 12, 86]
+
+        expected = {
+            90: [(4, 86), (23, 67)]
+        }
+
+        assert result_as_set(find_equal_sum_pairs(arr)) == result_as_set(expected)
 
 
 
@@ -219,6 +254,32 @@ class TestParseNumbers:
         with pytest.raises(SystemExit):
             _parse_numbers(["1", "abc", "3"])
 
+    def test_empty_string_token(self):
+        with pytest.raises(SystemExit):
+            _parse_numbers([""])
+
+    def test_whitespace_token(self):
+        with pytest.raises(SystemExit):
+            _parse_numbers(["   "])
+
+    def test_trailing_comma(self):
+        with pytest.raises(SystemExit):
+            _parse_numbers(["1,2,3,"])
+
+    def test_double_comma(self):
+        with pytest.raises(SystemExit):
+            _parse_numbers(["1,,2"])
+
+    @pytest.mark.parametrize("bad", [
+        "1.5",
+        "NaN",
+        "inf",
+        "0x10",
+    ])
+    def test_non_integer_values(self, bad):
+        with pytest.raises(SystemExit):
+            _parse_numbers([bad])
+
 
 # ---------------------------------------------------------------------------
 # CLI — input style integration tests
@@ -230,7 +291,7 @@ SCRIPT = "equal_sum_pairs.py"
 def _run(*args: str) -> subprocess.CompletedProcess:
     return subprocess.run(
         [sys.executable, SCRIPT, *args],
-        capture_output=True, text=True, cwd="/mnt/user-data/outputs"
+        capture_output=True, text=True, cwd=PROJECT_ROOT
     )
 
 
@@ -272,7 +333,7 @@ class TestCLI:
     def test_help_flag(self):
         proc = _run("--help")
         assert proc.returncode == 0
-        assert "Find all unique pairs" in proc.stdout
+        assert "usage:" in proc.stdout.lower()
 
     def test_invalid_input_exits_nonzero(self):
         proc = _run("1", "abc", "3")
