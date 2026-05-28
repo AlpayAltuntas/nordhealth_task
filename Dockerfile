@@ -12,9 +12,6 @@ COPY equal_sum_pairs.py .
 # ── Test stage ─────────────────────────────────────────────────────────────────
 FROM base AS test
 
-COPY requirements-dev.txt .
-RUN pip install --no-cache-dir -r requirements-dev.txt
-
 COPY test_equal_sum_pairs.py .
 
 # Run the full test suite (with coverage) as part of the image build

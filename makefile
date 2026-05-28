@@ -16,7 +16,7 @@ run: build  ## Run with default examples (or pass ARGS="1 2 3 4")
 test:  ## Run test suite inside Docker
 	docker build --target test -t $(IMAGE)-test .
 
-test-local:  ## Run test suite locally (requires: pip install -r requirements-dev.txt)
+test-local:  ## Run test suite locally (requires: pip install -r requirements.txt)
 	pytest test_equal_sum_pairs.py -v
 
 test-cov:  ## Run tests with coverage report locally

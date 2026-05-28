@@ -90,7 +90,6 @@ print(output)
 ├── docker-compose.yml       # app + test services
 ├── Makefile                 # build / run / test shortcuts
 ├── requirements.txt         # Runtime deps (stdlib only)
-└── requirements-dev.txt     # Dev deps (pytest, pytest-cov)
 ```
 
 ## Pylance / VS Code
