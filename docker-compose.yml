@@ -1,0 +1,15 @@
+services:
+  # Run the algorithm with the default problem-statement examples
+  app:
+    build:
+      context: .
+      target: runtime
+    image: equal-sum-pairs
+    # Pass your own numbers via:  docker compose run app 6 4 12 10 22 54
+
+  # Run the full test suite with coverage
+  test:
+    build:
+      context: .
+      target: test
+    image: equal-sum-pairs-test
